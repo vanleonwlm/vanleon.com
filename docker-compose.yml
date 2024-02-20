@@ -1,0 +1,60 @@
+version: '3'
+
+services:
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    container_name: nginx-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "/var/run/docker.sock:/tmp/docker.sock:ro"
+      - "./certs:/etc/nginx/certs:ro"
+      - vhost:/etc/nginx/vhost.d
+      - html:/usr/share/nginx/html
+    restart: always
+
+  letsencrypt:
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    container_name: letsencrypt
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./certs:/etc/nginx/certs:rw"
+    volumes_from:
+      - nginx-proxy
+    restart: always
+
+  mysql:
+    image: mysql:5.6
+    container_name: mysql
+    platform: linux/x86_64
+    environment:
+      MYSQL_ROOT_PASSWORD: $MYSQL_ROOT_PASSWORD # 设置 root 用户的密码
+      MYSQL_USER: $MYSQL_USER # 创建一个名为 username 的用户
+      MYSQL_PASSWORD: $MYSQL_PASSWORD # 用户 username 的密码
+    volumes:
+      - "./mysql_data:/var/lib/mysql"
+    restart: always
+
+  geek-time:
+    image: vanleon/geek-time:1.0.0
+    container_name: geek-time
+    expose:
+      - "80"
+    environment:
+      - VIRTUAL_HOST=$GEEK_TIME_VIRTUAL_HOST # 替换成你的域名
+      - LETSENCRYPT_HOST=$GEEK_TIME_VIRTUAL_HOST # 替换成你的域名
+      - LETSENCRYPT_EMAIL=$GEEK_TIME_LETSENCRYPT_EMAIL # 替换成你的邮箱地址
+      - MYSQL_HOST=mysql
+      - MYSQL_PORT=3306
+      - MYSQL_USER=$MYSQL_USER
+      - MYSQL_PASSWORD=$MYSQL_PASSWORD
+      - DB_DATABASE=$GEEK_TIME_MYSQL_DATABASE
+      - PORT=80
+    restart: always
+    depends_on:
+      - mysql
+
+volumes:
+  vhost:
+  html:
