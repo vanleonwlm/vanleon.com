@@ -10,8 +10,9 @@ services:
     volumes:
       - "/var/run/docker.sock:/tmp/docker.sock:ro"
       - "./certs:/etc/nginx/certs:ro"
-      - vhost:/etc/nginx/vhost.d
-      - html:/usr/share/nginx/html
+      - "./acme:/etc/acme.sh"
+      - "./vhost:/etc/nginx/vhost.d"
+      - "./html:/usr/share/nginx/html"
     restart: always
 
   letsencrypt:
@@ -54,7 +55,3 @@ services:
     restart: always
     depends_on:
       - mysql
-
-volumes:
-  vhost:
-  html:
