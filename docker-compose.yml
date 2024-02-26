@@ -37,6 +37,18 @@ services:
       - "./mysql_data:/var/lib/mysql"
     restart: always
 
+  home:
+    image: nginx:latest
+    container_name: home
+    expose:
+        - "80"
+    environment:
+      - VIRTUAL_HOST=$HOME_VIRTUAL_HOST # 替换成你的域名
+      - LETSENCRYPT_HOST=$HOME_VIRTUAL_HOST # 替换成你的域名
+      - LETSENCRYPT_EMAIL=$HOME_LETSENCRYPT_EMAIL # 替换成你的邮箱地址
+    volumes:
+      - "./html:/usr/share/nginx/html"
+
   geek-time:
     image: vanleon/geek-time:1.0.0
     container_name: geek-time
