@@ -1,0 +1,1 @@
+nohub docker compose up >> output.log 2>&1 &
