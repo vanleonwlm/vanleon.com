@@ -50,7 +50,7 @@ services:
       - "./html:/usr/share/nginx/html"
 
   geek-time:
-    image: vanleon/geek-time:1.0.6
+    image: vanleon/geek-time:1.0.7
     platform: linux/amd64
     container_name: geek-time
     expose:
